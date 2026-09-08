@@ -1,0 +1,43 @@
+name: Testes REST Assured
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar o código dos testes (este repositório)
+        uses: actions/checkout@v4
+
+      - name: Baixar o código da API (cake-controller)
+        uses: actions/checkout@v4
+        with:
+          repository: cip-p/spring-boot-example
+          path: cake-api
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Iniciar a API em segundo plano
+        working-directory: cake-api
+        run: |
+          mvn spring-boot:run &
+          echo "Aguardando a API subir..."
+          for i in {1..30}; do
+            if curl -s http://localhost:8081/cakes -u cake-user:cake123 > /dev/null; then
+              echo "API disponível!"
+              break
+            fi
+            sleep 2
+          done
+
+      - name: Rodar os testes REST Assured
+        run: mvn clean test
