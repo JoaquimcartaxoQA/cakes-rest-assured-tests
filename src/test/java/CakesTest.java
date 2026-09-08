@@ -1,10 +1,12 @@
 import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
@@ -12,11 +14,22 @@ import static org.hamcrest.Matchers.*;
 public class CakesTest {
 
     private static RequestSpecification requestSpec;
+    private final List<Integer> createdCakeIds = new ArrayList<>();
 
     @BeforeAll
     static void setup() {
         baseURI = "http://localhost:8081";
         requestSpec = TestConfig.getRequestSpecification();
+    }
+
+    @AfterEach
+    void cleanup() {
+        for (int id : createdCakeIds){
+            given(requestSpec)
+            .when()
+                    .delete("/cakes/" + id);
+        }
+        createdCakeIds.clear();
     }
 
     @Test
@@ -83,7 +96,7 @@ public class CakesTest {
                 .body("id", notNullValue());
     }
 
-    /*//Verificar regra de negócio, titulo null com permissão para crear, mas quebra metodo GETall.
+   /* //Verificar regra de negócio, titulo null com permissão para crear, mas quebra metodo GETall.
     @Test
     void shouldReturn201WhenCreatingCakeWithoutTitle() {
 
@@ -99,7 +112,7 @@ public class CakesTest {
                 .body("title", nullValue())
                 .body("description", equalTo("Cake sem título"))
                 .body("id", notNullValue());
-    }*/
+    } */
 
     @Test
     void shouldReturn201WhenCreatingCakeWithEmptyTitle() {
