@@ -70,13 +70,9 @@ public class CakesTest {
     @Test
     void shouldReturn201WhenCreatingCake() {
 
-        Map<String, String> newCake = Map.of(
-                "title", "Chocolate Cake",
-                "description", "Delicious chocolate cake with ganache"
-        );
         given(requestSpec)
                 .contentType("application/json")
-                .body(newCake)
+                .body(CakesTestData.validCake())
         .when()
                 .post("/cakes")
         .then()
@@ -85,5 +81,40 @@ public class CakesTest {
                 .statusCode(201)
                 .body("title", equalTo("Chocolate Cake"))
                 .body("id", notNullValue());
+    }
+
+    /*//Verificar regra de negócio, titulo null com permissão para crear, mas quebra metodo GETall.
+    @Test
+    void shouldReturn201WhenCreatingCakeWithoutTitle() {
+
+        given(requestSpec)
+                .contentType("application/json")
+                .body(CakesTestData.cakeWithoutTitle())
+        .when()
+                .post("/cakes")
+        .then()
+                .log()
+                .all()
+                .statusCode(201)
+                .body("title", nullValue())
+                .body("description", equalTo("Cake sem título"))
+                .body("id", notNullValue());
+    }*/
+
+    @Test
+    void shouldReturn201WhenCreatingCakeWithEmptyTitle() {
+
+        given(requestSpec)
+                .contentType("application/json")
+                .body(CakesTestData.cakeWithEmptyTitle())
+        .when()
+                .post("/cakes")
+        .then()
+                .log()
+                .all()
+                .statusCode(201)
+                .body("title", equalTo(""))
+                .body("description", equalTo("Cake com título vazio"))
+                .body("id", notNullValue());;
     }
 }
