@@ -17,7 +17,7 @@ jobs:
       - name: Baixar o código da API (cake-controller)
         uses: actions/checkout@v4
         with:
-          repository: cip-p/spring-boot-example
+          repository: JoaquimcartaxoQA/cakes-service-api
           path: cake-api
 
       - name: Configurar Java 21
