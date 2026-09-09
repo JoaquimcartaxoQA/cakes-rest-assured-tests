@@ -1,3 +1,4 @@
+import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -96,7 +97,7 @@ public class CakesTest {
                 .body("id", notNullValue());
     }
 
-   /* //Verificar regra de negócio, titulo null com permissão para crear, mas quebra metodo GETall.
+   /*//Verificar regra de negócio, titulo null com permissão para crear, mas quebra metodo GETall.
     @Test
     void shouldReturn201WhenCreatingCakeWithoutTitle() {
 
@@ -112,7 +113,7 @@ public class CakesTest {
                 .body("title", nullValue())
                 .body("description", equalTo("Cake sem título"))
                 .body("id", notNullValue());
-    } */
+    }*/
 
     @Test
     void shouldReturn201WhenCreatingCakeWithEmptyTitle() {
@@ -129,5 +130,37 @@ public class CakesTest {
                 .body("title", equalTo(""))
                 .body("description", equalTo("Cake com título vazio"))
                 .body("id", notNullValue());;
+    }
+
+    @Test
+    void shouldReturn204WhenDeletingCakeById() {
+
+        Response createResponse = given(requestSpec)
+                .contentType("application/json")
+                .body(CakesTestData.validCake())
+                .when()
+                .post("/cakes");
+
+        int id = createResponse.path("id");
+
+        given(requestSpec)
+        .when()
+                .delete("/cakes/" + id)
+        .then()
+                .log()
+                .all()
+                .statusCode(204);
+    }
+
+    @Test
+    void shouldReturn404WhenDeletingNonExistentCake() {
+
+        given(requestSpec)
+        .when()
+                .delete("/cakes/999999")
+        .then()
+                .log()
+                .all()
+                .statusCode(404);
     }
 }
