@@ -163,4 +163,35 @@ public class CakesTest {
                 .all()
                 .statusCode(404);
     }
+
+    @Test
+    void shouldReturnErrorWhenCreatingCakeWithoutContentType() {
+
+        given(requestSpec)
+                .body(CakesTestData.validCake())
+        .when()
+                .post("/cakes")
+        .then()
+                .log()
+                .all()
+                .statusCode(415)
+                .body("error", equalTo("Unsupported Media Type"));
+    }
+
+    @Test
+    void shouldReturnErrorWhenCreatingCakeWithWrongContentType() {
+
+        String cakeAsJsonString = "{\"title\": \"Chocolate Cake\", \"description\": \"Delicious chocolate cake\"}";
+
+        given(requestSpec)
+                .contentType("text/plain")
+                .body(cakeAsJsonString)
+        .when()
+                .post("/cakes")
+        .then()
+                .log()
+                .all()
+                .statusCode(415)
+                .body("error", equalTo("Unsupported Media Type"));
+    }
 }
